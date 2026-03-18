@@ -2,13 +2,13 @@
 
 import { Sidebar } from '@/components/layout/sidebar';
 import { useAuth } from '@/hooks/use-auth';
-import { CategoriesProvider } from '@/contexts/categories-context';
+import { CategoriaProvider } from '@/contexts/categories-context';
 import { PeopleProvider } from '@/contexts/people-context';
-import { TransactionsProvider } from '@/contexts/transactions-context';
+import { TransacaoProvider } from '@/contexts/transactions-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function DashboardLayout({
+export default function PagesLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -31,9 +31,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <CategoriesProvider>
+    <CategoriaProvider>
       <PeopleProvider>
-        <TransactionsProvider>
+        <TransacaoProvider>
           <div className="flex">
             <Sidebar />
             <main className="flex-1 ml-0 lg:ml-64 min-h-screen bg-slate-50">
@@ -42,8 +42,8 @@ export default function DashboardLayout({
               </div>
             </main>
           </div>
-        </TransactionsProvider>
+        </TransacaoProvider>
       </PeopleProvider>
-    </CategoriesProvider>
+    </CategoriaProvider>
   );
 }

@@ -62,6 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response != null) {
         localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
+
+        setIsAuthenticated(true);
+        setNameUser(obterNomeUsuario(response.token));
       } else {
         throw new Error('Resposta inválida do servidor');
       }
@@ -97,8 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{      
-        nameUser,  
+      value={{
+        nameUser,
         isLoading,
         isAuthenticated,
         login,

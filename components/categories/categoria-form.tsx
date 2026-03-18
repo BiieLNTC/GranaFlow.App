@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useCategories } from '@/hooks/use-categories';
+import { useCategorias } from '@/hooks/use-categorias';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -26,40 +26,43 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const categorySchema = z.object({
+const categoriaSchema = z.object({
+  id: z.number(),
   descricao: z.string({ message: "Campo Obrigatório!" }).min(2, 'Deve ter no mínimo 2 caracteres!').max(400, 'Nome muito longo'),
   finalidade: z.number({ message: "Campo Obrigatório!" }),
-  cor: z.string({message:"Campo Obrigatório!"})
+  cor: z.string({ message: "Campo obrigatório!" }).regex(/^#([0-9A-Fa-f]{6})$/, "Cor inválida")
 });
 
-type CategoryFormData = z.infer<typeof categorySchema>;
+type CategoriaFormData = z.infer<typeof categoriaSchema>;
 
-interface CategoryFormProps {
-  category?: Categoria;
+interface CategoriaFormProps {
+  categoria?: Categoria;
   onSuccess?: () => void;
 }
 
-export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
-  const { createCategory, updateCategory } = useCategories();
+export function CategoryForm({ categoria, onSuccess }: CategoriaFormProps) {
+  
+  const { createCategoria, updateCategoria } = useCategorias();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
+  const form = useForm<CategoriaFormData>({
+    resolver: zodResolver(categoriaSchema),
     defaultValues: {
-      descricao: category?.descricao,
-      finalidade: category?.finalidade,
-      cor: category?.cor
+      id: categoria?.id ?? 0,
+      descricao: categoria?.descricao ?? "",
+      finalidade: categoria?.finalidade ?? 0,
+      cor: categoria?.cor ?? "#000000"
     },
   });
 
-  async function onSubmit(values: CategoryFormData) {
+  async function onSubmit(values: CategoriaFormData) {
     setIsSubmitting(true);
     try {
-      if (category) {
-        await updateCategory(category.id, values);
+      if (categoria) {
+        await updateCategoria(values);
         toast.success('Categoria atualizada com sucesso!');
       } else {
-        await createCategory(values);
+        await createCategoria(values);
         toast.success('Categoria criada com sucesso!');
         form.reset();
       }
@@ -154,7 +157,7 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
               <Spinner className="mr-2 h-4 w-4" />
               Salvando...
             </>
-          ) : category ? (
+          ) : categoria ? (
             'Atualizar'
           ) : (
             'Criar'

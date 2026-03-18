@@ -5,29 +5,29 @@ import { Pessoa, CreatePessoaRequest } from '@/lib/types';
 import { apiClient } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/constants';
 
-interface PeopleContextType {
-  people: Pessoa[];
+interface PessoaContextType {
+  listPessoa: Pessoa[];
   isLoading: boolean;
   error: string | null;
-  fetchPeople: () => Promise<void>;
-  createPerson: (data: CreatePessoaRequest) => Promise<Pessoa>;
-  updatePerson: (id: number, data: CreatePessoaRequest) => Promise<Pessoa>;
-  deletePerson: (id: number) => Promise<void>;
+  getPessoa: () => Promise<void>;
+  createPessoa: (data: CreatePessoaRequest) => Promise<Pessoa>;
+  updatePessoa: (id: number, data: CreatePessoaRequest) => Promise<Pessoa>;
+  deletePessoa: (id: number) => Promise<void>;
 }
 
-export const PeopleContext = createContext<PeopleContextType | undefined>(undefined);
+export const PessoaContext = createContext<PessoaContextType | undefined>(undefined);
 
 export function PeopleProvider({ children }: { children: ReactNode }) {
-  const [people, setPeople] = useState<Pessoa[]>([]);
+  const [listPessoa, setListPessoa] = useState<Pessoa[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPeople = useCallback(async () => {
+  const getPessoa = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await apiClient.get<Pessoa[]>(API_ENDPOINTS.PEOPLE);
-      setPeople(Array.isArray(data) ? data : []);
+      setListPessoa(Array.isArray(data) ? data : []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar pessoas';
       setError(errorMessage);
@@ -37,11 +37,11 @@ export function PeopleProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const createPerson = useCallback(async (data: CreatePessoaRequest) => {
+  const createPessoa = useCallback(async (data: CreatePessoaRequest) => {
     setError(null);
     try {
       const response = await apiClient.post<Pessoa>(API_ENDPOINTS.PEOPLE, data);
-      setPeople((prev) => [...prev, response]);
+      setListPessoa((prev) => [...prev, response]);
       return response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao criar pessoa';
@@ -50,11 +50,11 @@ export function PeopleProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const updatePerson = useCallback(async (id: number, data: CreatePessoaRequest) => {
+  const updatePessoa = useCallback(async (id: number, data: CreatePessoaRequest) => {
     setError(null);
     try {
-      const response = await apiClient.put<Pessoa>(API_ENDPOINTS.PERSON(id), data);
-      setPeople((prev) =>
+      const response = await apiClient.put<Pessoa>(API_ENDPOINTS.PEOPLE, data);
+      setListPessoa((prev) =>
         prev.map((person) => (person.id === id ? response : person))
       );
       return response;
@@ -65,11 +65,11 @@ export function PeopleProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const deletePerson = useCallback(async (id: number) => {
+  const deletePessoa = useCallback(async (id: number) => {
     setError(null);
     try {
       await apiClient.delete(API_ENDPOINTS.PERSON(id));
-      setPeople((prev) => prev.filter((person) => person.id !== id));
+      setListPessoa((prev) => prev.filter((person) => person.id !== id));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar pessoa';
       setError(errorMessage);
@@ -78,18 +78,18 @@ export function PeopleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <PeopleContext.Provider
+    <PessoaContext.Provider
       value={{
-        people,
+        listPessoa,
         isLoading,
         error,
-        fetchPeople,
-        createPerson,
-        updatePerson,
-        deletePerson,
+        getPessoa,
+        createPessoa,
+        updatePessoa,
+        deletePessoa,
       }}
     >
       {children}
-    </PeopleContext.Provider>
+    </PessoaContext.Provider>
   );
 }

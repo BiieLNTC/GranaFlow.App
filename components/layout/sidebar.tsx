@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { BarChart3, Users, Tag, User, LogOut, Menu, X } from 'lucide-react';
+import { BarChart3, HandCoins, Users, Tag, User, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 const menuItems = [
@@ -16,25 +16,35 @@ const menuItems = [
   },
   {
     label: 'Transações',
-    href: '/dashboard/transactions',
-    icon: BarChart3,
+    href: '/transacoes',
+    icon: HandCoins,
   },
   {
     label: 'Categorias',
-    href: '/dashboard/categories',
+    href: '/categorias',
     icon: Tag,
   },
   {
     label: 'Pessoas',
-    href: '/dashboard/people',
+    href: '/pessoas',
     icon: Users,
   },
 ];
 
+
 export function Sidebar() {
+  const router = useRouter();
   const pathname = usePathname();
-  const { logout, user } = useAuth();
+  const { logout, nameUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  function onLogount() {
+    logout()
+
+    setTimeout(() => {
+      router.replace('/login');
+    }, 100);
+  }
 
   return (
     <>
@@ -91,13 +101,12 @@ export function Sidebar() {
                 <User size={20} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user?.nome}</p>
-                <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                <p className="text-sm font-medium truncate">{nameUser}</p>
               </div>
             </div>
 
             <Button
-              onClick={logout}
+              onClick={onLogount}
               variant="outline"
               className="w-full border-slate-700 text-slate-300 hover:bg-slate-800"
             >

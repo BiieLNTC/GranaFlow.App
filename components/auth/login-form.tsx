@@ -48,9 +48,12 @@ export function LoginForm() {
         email: values.email,
         senha: values.senha,
       });
-      
+
       toast.success('Login realizado com sucesso!');
-      router.push('/');
+
+      setTimeout(() => {
+        router.replace('/');
+      }, 100);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao fazer login';
       toast.error(errorMessage);

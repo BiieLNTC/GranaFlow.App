@@ -3,20 +3,22 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhos
 
 export const API_ENDPOINTS = {
   // Auth
-  LOGIN: '/api/usuario/login',
+  LOGIN: '/api/usuario/Login',
   REGISTER: '/api/usuario/CreateAccount',
   
   // Transactions
-  TRANSACTIONS: '/api/transacoes',
-  TRANSACTION: (id: number) => `/api/transacoes/${id}`,
+  TRANSACTIONS: '/api/transacao',
+  ObterTotaisTransacoes: '/api/transacao/ObterTotaisTransacoes',
+  ObterTotaisPessoas: '/api/transacao/ObterTotaisPessoas',
+  TRANSACTION: (id: number) => `/api/transacao/${id}`,
   
   // Categories
   CATEGORIES: '/api/categoria',
   CATEGORY: (id: number) => `/api/categoria/${id}`,
   
   // People
-  PEOPLE: '/api/pessoas',
-  PERSON: (id: number) => `/api/pessoas/${id}`,
+  PEOPLE: '/api/pessoa',
+  PERSON: (id: number) => `/api/pessoa/${id}`,
 };
 
 // Storage Keys

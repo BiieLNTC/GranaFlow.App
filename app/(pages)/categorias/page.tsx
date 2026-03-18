@@ -1,4 +1,4 @@
-import { CategoryList } from '@/components/categories/category-list';
+import { ListCategoria } from '@/components/categories/categoria-list';
 
 export const metadata = {
   title: 'Categorias - GranaFlow',
@@ -8,7 +8,7 @@ export const metadata = {
 export default function CategoriesPage() {
   return (
     <div>
-      <CategoryList />
+      <ListCategoria />
     </div>
   );
 }

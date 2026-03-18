@@ -3,9 +3,10 @@
 import { useAuth } from '@/hooks/use-auth';
 import { DashboardSummary } from '@/components/dashboard/dashboard-summary';
 import { ExpensesChart } from '@/components/dashboard/expenses-chart';
+import { ListTotaisPorPessoa } from '@/components/dashboard/list-totais-pessoa';
 
 export default function DashboardPage() {
-   const { nameUser } = useAuth();
+  const { nameUser } = useAuth();
 
   return (
     <div className="space-y-6">
@@ -18,10 +19,13 @@ export default function DashboardPage() {
         <p className="text-slate-600 mt-2">Aqui está seu resumo financeiro</p>
       </div>
 
-      {/* Summary Cards */}
+      {/* Totais */}
       <DashboardSummary />
 
-      {/* Charts */}
+      {/*Totais por Pessoa*/}
+      <ListTotaisPorPessoa />
+
+      {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ExpensesChart />
       </div>

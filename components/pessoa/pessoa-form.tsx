@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { usePeople } from '@/hooks/use-people';
+import { usePessoa } from '@/hooks/use-pessoa';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,41 +19,43 @@ import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { Pessoa } from '@/lib/types';
 
-const personSchema = z.object({
-  nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(150, 'Nome muito longo'),
+const pessoaSchema = z.object({
+  id: z.number(),
+  nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(200, 'Nome muito longo'),
   dataNascimento: z.string().refine((date) => {
     const d = new Date(date);
     return d instanceof Date && !isNaN(d.getTime());
   }, 'Data de nascimento inválida'),
 });
 
-type PersonFormData = z.infer<typeof personSchema>;
+type PersonFormData = z.infer<typeof pessoaSchema>;
 
 interface PersonFormProps {
-  person?: Pessoa;
+  pessoa?: Pessoa;
   onSuccess?: () => void;
 }
 
-export function PersonForm({ person, onSuccess }: PersonFormProps) {
-  const { createPerson, updatePerson } = usePeople();
+export function PessoaForm({ pessoa, onSuccess }: PersonFormProps) {
+  const { createPessoa, updatePessoa } = usePessoa();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<PersonFormData>({
-    resolver: zodResolver(personSchema),
+    resolver: zodResolver(pessoaSchema),
     defaultValues: {
-      nome: person?.nome || '',
-      dataNascimento: person?.dataNascimento?.split('T')[0] || '',
+      id: pessoa?.id || 0,
+      nome: pessoa?.nome || '',
+      dataNascimento: pessoa?.dataNascimento?.split('T')[0] || '',
     },
   });
 
   async function onSubmit(values: PersonFormData) {
     setIsSubmitting(true);
     try {
-      if (person) {
-        await updatePerson(person.id, values);
+      if (pessoa) {
+        await updatePessoa(pessoa.id, values);
         toast.success('Pessoa atualizada com sucesso!');
       } else {
-        await createPerson(values);
+        await createPessoa(values);
         toast.success('Pessoa criada com sucesso!');
         form.reset();
       }
@@ -117,7 +119,7 @@ export function PersonForm({ person, onSuccess }: PersonFormProps) {
               <Spinner className="mr-2 h-4 w-4" />
               Salvando...
             </>
-          ) : person ? (
+          ) : pessoa ? (
             'Atualizar'
           ) : (
             'Criar'

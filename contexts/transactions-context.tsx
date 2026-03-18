@@ -1,33 +1,40 @@
 'use client';
 
 import React, { createContext, useState, useCallback, ReactNode } from 'react';
-import { Transacao, CreateTransacaoRequest } from '@/lib/types';
+import { Transacao, CreateTransacaoRequest, TotaisTransacoes, DEFAULT_TOTAIS_TRANSACOES, TotaisPessoa } from '@/lib/types';
 import { apiClient } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/constants';
 
-interface TransactionsContextType {
-  transactions: Transacao[];
+interface TransacaoContextType {
+  totaisTransacoes: TotaisTransacoes;
+  listTransacoes: Transacao[];
+  listTotaisPessoa: TotaisPessoa[];
   isLoading: boolean;
   error: string | null;
-  fetchTransactions: () => Promise<void>;
-  createTransaction: (data: CreateTransacaoRequest) => Promise<Transacao>;
-  updateTransaction: (id: number, data: CreateTransacaoRequest) => Promise<Transacao>;
-  deleteTransaction: (id: number) => Promise<void>;
+  getListTransacao: () => Promise<void>;
+  getTotaisTransacao: () => Promise<void>;
+  getTotaisPessoa: () => Promise<void>;
+  createTransacao: (data: CreateTransacaoRequest) => Promise<Transacao>;
+  updateTransacao: (id: number, data: CreateTransacaoRequest) => Promise<Transacao>;
+  deleteTransacao: (id: number) => Promise<void>;
 }
 
-export const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
+export const TransacaoContext = createContext<TransacaoContextType | undefined>(undefined);
 
-export function TransactionsProvider({ children }: { children: ReactNode }) {
-  const [transactions, setTransactions] = useState<Transacao[]>([]);
+export function TransacaoProvider({ children }: { children: ReactNode }) {
+  const [listTransacoes, setListTransacoes] = useState<Transacao[]>([]);
+  const [totaisTransacoes, setTotaisTransacoes] = useState<TotaisTransacoes>(DEFAULT_TOTAIS_TRANSACOES)
+  const [listTotaisPessoa, setListTotaisPessoa] = useState<TotaisPessoa[]>([])
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTransactions = useCallback(async () => {
+  const getListTransacao = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await apiClient.get<Transacao[]>(API_ENDPOINTS.TRANSACTIONS);
-      setTransactions(Array.isArray(data) ? data : []);
+      setListTransacoes(Array.isArray(data) ? data : []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
       setError(errorMessage);
@@ -37,11 +44,11 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const createTransaction = useCallback(async (data: CreateTransacaoRequest) => {
+  const createTransacao = useCallback(async (data: CreateTransacaoRequest) => {
     setError(null);
     try {
       const response = await apiClient.post<Transacao>(API_ENDPOINTS.TRANSACTIONS, data);
-      setTransactions((prev) => [...prev, response]);
+      setListTransacoes((prev) => [...prev, response]);
       return response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao criar transação';
@@ -50,12 +57,12 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const updateTransaction = useCallback(
+  const updateTransacao = useCallback(
     async (id: number, data: CreateTransacaoRequest) => {
       setError(null);
       try {
-        const response = await apiClient.put<Transacao>(API_ENDPOINTS.TRANSACTION(id), data);
-        setTransactions((prev) =>
+        const response = await apiClient.put<Transacao>(API_ENDPOINTS.TRANSACTIONS, data);
+        setListTransacoes((prev) =>
           prev.map((trans) => (trans.id === id ? response : trans))
         );
         return response;
@@ -68,11 +75,11 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const deleteTransaction = useCallback(async (id: number) => {
+  const deleteTransacao = useCallback(async (id: number) => {
     setError(null);
     try {
       await apiClient.delete(API_ENDPOINTS.TRANSACTION(id));
-      setTransactions((prev) => prev.filter((trans) => trans.id !== id));
+      setListTransacoes((prev) => prev.filter((trans) => trans.id !== id));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar transação';
       setError(errorMessage);
@@ -80,19 +87,55 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const getTotaisTransacao = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiClient.get<TotaisTransacoes>(API_ENDPOINTS.ObterTotaisTransacoes);
+      setTotaisTransacoes(data);
+    }
+    catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
+      setError(errorMessage);
+      console.error('Erro ao buscar transações:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [])
+
+    const getTotaisPessoa = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiClient.get<TotaisPessoa[]>(API_ENDPOINTS.ObterTotaisPessoas);
+      setListTotaisPessoa(data);
+    }
+    catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
+      setError(errorMessage);
+      console.error('Erro ao buscar transações:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [])
+
   return (
-    <TransactionsContext.Provider
+    <TransacaoContext.Provider
       value={{
-        transactions,
+        totaisTransacoes,
+        listTransacoes,
+        listTotaisPessoa,
         isLoading,
         error,
-        fetchTransactions,
-        createTransaction,
-        updateTransaction,
-        deleteTransaction,
+        getListTransacao,
+        getTotaisTransacao,
+        getTotaisPessoa,
+        createTransacao,
+        updateTransacao,
+        deleteTransacao,
       }}
     >
       {children}
-    </TransactionsContext.Provider>
+    </TransacaoContext.Provider>
   );
 }

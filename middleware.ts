@@ -15,9 +15,10 @@ export function middleware(request: NextRequest) {
   // Se o usuário não tem token e não está em rota pública, redireciona para login
   if (!publicRoutes.includes(pathname) && !token && pathname !== '/') {
     // Verificar se é uma rota do dashboard que requer autenticação
-    if (pathname.startsWith('/transactions') || 
-        pathname.startsWith('/categories') || 
-        pathname.startsWith('/people') ||
+    if (
+        // pathname.startsWith('/transactions') || 
+        // pathname.startsWith('/categories') || 
+        // pathname.startsWith('/people') ||
         pathname.startsWith('/settings')) {
       return NextResponse.redirect(new URL('/login', request.url));
     }

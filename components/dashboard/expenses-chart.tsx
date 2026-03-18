@@ -1,34 +1,24 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useTransactions } from '@/hooks/use-transactions';
+import { useTransacao } from '@/hooks/use-transacao';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const COLORS = [
-  '#10b981',
-  '#06b6d4',
-  '#8b5cf6',
-  '#f59e0b',
-  '#ef4444',
-  '#ec4899',
-  '#14b8a6',
-  '#6366f1',
-];
+import { TipoTransacao } from '@/lib/types';
 
 export function ExpensesChart() {
-  const { transactions, fetchTransactions } = useTransactions();
+  const { listTransacoes, getListTransacao } = useTransacao();
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    getListTransacao();
+  }, [getListTransacao]);
 
   // Agrupar despesas por categoria
-  const despesasPorCategoria = transactions
-    .filter((t) => t.tipo === 'Despesa')
+  const despesasPorCategoria = listTransacoes
+    .filter((t) => t.tipo === TipoTransacao.Despesa)
     .reduce(
       (acc, t) => {
-        const categoriaName = t.categoria?.nome || 'Sem categoria';
+        const categoriaName = t.nomeCategoria || 'Sem categoria';
         const existente = acc.find((item) => item.name === categoriaName);
 
         if (existente) {
@@ -37,12 +27,13 @@ export function ExpensesChart() {
           acc.push({
             name: categoriaName,
             value: Number(t.valor.toFixed(2)),
+            cor: t.corCategoria
           });
         }
 
         return acc;
       },
-      [] as { name: string; value: number }[]
+      [] as { name: string; value: number; cor: string }[]
     )
     .sort((a, b) => b.value - a.value);
 
@@ -79,8 +70,8 @@ export function ExpensesChart() {
               fill="#8884d8"
               dataKey="value"
             >
-              {despesasPorCategoria.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              {despesasPorCategoria.map((cat, index) => (
+                <Cell key={`cell-${index}`} fill={cat.cor} />
               ))}
             </Pie>
             <Tooltip

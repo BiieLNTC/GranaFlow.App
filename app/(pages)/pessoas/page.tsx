@@ -1,4 +1,4 @@
-import { PersonList } from '@/components/people/person-list';
+import { ListPessoa } from '@/components/pessoa/pessoa-list';
 
 export const metadata = {
   title: 'Pessoas - GranaFlow',
@@ -8,7 +8,7 @@ export const metadata = {
 export default function PeoplePage() {
   return (
     <div>
-      <PersonList />
+      <ListPessoa />
     </div>
   );
 }

@@ -28,12 +28,13 @@ export interface Transacao {
   id: number;
   usuarioId: number;
   categoriaId: number;
+  nomeCategoria: string,
+  corCategoria: string,
   pessoaId: number;
-  categoria?: Categoria;
-  pessoa?: Pessoa;
+  nomePessoa: string;
   dataTransacao: string;
   descricao: string;
-  tipo: 'Receita' | 'Despesa';
+  tipo: TipoTransacao;
   valor: number;
   cadastradoEm: string;
 }
@@ -43,7 +44,7 @@ export interface CreateTransacaoRequest {
   pessoaId: number;
   dataTransacao: string;
   descricao: string;
-  tipo: 'Receita' | 'Despesa';
+  tipo: number;
   valor: number;
 }
 
@@ -57,6 +58,7 @@ export interface Categoria {
 }
 
 export interface CreateCategoriaRequest {
+  id: number;
   descricao: string;
   finalidade: number;
   cor: string;
@@ -77,9 +79,32 @@ export interface CreatePessoaRequest {
 }
 
 // Enum para tipos de transação
-export enum ETipoTransacao {
-  Receita = 'Receita',
-  Despesa = 'Despesa'
+export enum TipoTransacao {
+  Despesa = 1,
+  Receita = 2
+}
+
+export interface TotaisTransacoes {
+  saldoTotal: number
+  saldoReceitasMes: number
+  totalReceitasMes: number
+  saldoDespesasMes: number
+  totalDespesasMes: number
+}
+
+export const DEFAULT_TOTAIS_TRANSACOES: TotaisTransacoes = {
+  saldoTotal: 0,
+  saldoReceitasMes: 0,
+  totalReceitasMes: 0,
+  saldoDespesasMes: 0,
+  totalDespesasMes: 0,
+};
+
+export interface TotaisPessoa {
+  nome: string
+  receitas: number
+  despesas: number
+  saldo: number
 }
 
 // Helper para calcular idade

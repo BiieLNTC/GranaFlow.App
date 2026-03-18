@@ -5,29 +5,29 @@ import { Categoria, CreateCategoriaRequest } from '@/lib/types';
 import { apiClient } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/constants';
 
-interface CategoriesContextType {
-  categories: Categoria[];
+interface CategoriaContextType {
+  listCategorias: Categoria[];
   isLoading: boolean;
   error: string | null;
-  fetchCategories: () => Promise<void>;
-  createCategory: (data: CreateCategoriaRequest) => Promise<Categoria>;
-  updateCategory: (id: number, data: CreateCategoriaRequest) => Promise<Categoria>;
-  deleteCategory: (id: number) => Promise<void>;
+  getCategorias: () => Promise<void>;
+  createCategoria: (data: CreateCategoriaRequest) => Promise<Categoria>;
+  updateCategoria: (data: CreateCategoriaRequest) => Promise<Categoria>;
+  deleteCategoria: (id: number) => Promise<void>;
 }
 
-export const CategoriesContext = createContext<CategoriesContextType | undefined>(undefined);
+export const CategoriaContext = createContext<CategoriaContextType | undefined>(undefined);
 
-export function CategoriesProvider({ children }: { children: ReactNode }) {
-  const [categories, setCategories] = useState<Categoria[]>([]);
+export function CategoriaProvider({ children }: { children: ReactNode }) {
+  const [listCategorias, setListCategorias] = useState<Categoria[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCategories = useCallback(async () => {
+  const getCategorias = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await apiClient.get<Categoria[]>(API_ENDPOINTS.CATEGORIES);
-      setCategories(Array.isArray(data) ? data : []);
+      setListCategorias(Array.isArray(data) ? data : []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar categorias';
       setError(errorMessage);
@@ -37,11 +37,11 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const createCategory = useCallback(async (data: CreateCategoriaRequest) => {
+  const createCategoria = useCallback(async (data: CreateCategoriaRequest) => {
     setError(null);
     try {
       const response = await apiClient.post<Categoria>(API_ENDPOINTS.CATEGORIES, data);
-      setCategories((prev) => [...prev, response]);
+      setListCategorias((prev) => [...prev, response]);
       return response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao criar categoria';
@@ -50,12 +50,12 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const updateCategory = useCallback(async (id: number, data: CreateCategoriaRequest) => {
+  const updateCategoria = useCallback(async (data: CreateCategoriaRequest) => {
     setError(null);
     try {
-      const response = await apiClient.put<Categoria>(API_ENDPOINTS.CATEGORY(id), data);
-      setCategories((prev) =>
-        prev.map((cat) => (cat.id === id ? response : cat))
+      const response = await apiClient.put<Categoria>(API_ENDPOINTS.CATEGORIES, data);
+      setListCategorias((prev) =>
+        prev.map((cat) => (cat.id === data.id ? response : cat))
       );
       return response;
     } catch (err) {
@@ -65,11 +65,11 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const deleteCategory = useCallback(async (id: number) => {
+  const deleteCategoria = useCallback(async (id: number) => {
     setError(null);
     try {
       await apiClient.delete(API_ENDPOINTS.CATEGORY(id));
-      setCategories((prev) => prev.filter((cat) => cat.id !== id));
+      setListCategorias((prev) => prev.filter((cat) => cat.id !== id));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar categoria';
       setError(errorMessage);
@@ -78,18 +78,18 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <CategoriesContext.Provider
+    <CategoriaContext.Provider
       value={{
-        categories,
+        listCategorias,
         isLoading,
         error,
-        fetchCategories,
-        createCategory,
-        updateCategory,
-        deleteCategory,
+        getCategorias,
+        createCategoria,
+        updateCategoria,
+        deleteCategoria,
       }}
     >
       {children}
-    </CategoriesContext.Provider>
+    </CategoriaContext.Provider>
   );
 }

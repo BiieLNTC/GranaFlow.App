@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useTransactions } from '@/hooks/use-transactions';
-import { useCategories } from '@/hooks/use-categories';
-import { usePeople } from '@/hooks/use-people';
+import { useTransacao } from '@/hooks/use-transacao';
+import { useCategorias } from '@/hooks/use-categorias';
+import { usePessoa } from '@/hooks/use-pessoa';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -28,70 +28,86 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
-import { Transacao, ehMenorDeIdade } from '@/lib/types';
+import { TipoTransacao, Transacao, ehMenorDeIdade } from '@/lib/types';
 import { AlertCircle } from 'lucide-react';
 
-const transactionSchema = z.object({
-  categoriaId: z.string().refine((val) => !isNaN(Number(val)), 'Categoria inválida'),
-  pessoaId: z.string().refine((val) => !isNaN(Number(val)), 'Pessoa inválida'),
-  dataTransacao: z.string(),
+const transacaoSchema = z.object({
+  id: z.number(),
+  categoriaId: z.string().min(1, "Campo Obrigatório!").refine((val) => !isNaN(Number(val)), 'Categoria inválida'),
+  pessoaId: z.string().min(1, "Campo Obrigatório!").refine((val) => !isNaN(Number(val)), 'Pessoa inválida'),
+  dataTransacao: z.string().min(1, "Campo obrigatório!").refine((val) => !isNaN(Date.parse(val)), "Data inválida"),
   descricao: z.string().min(3, 'Descrição deve ter no mínimo 3 caracteres').max(400),
-  tipo: z.enum(['Receita', 'Despesa']),
+  tipo: z.nativeEnum(TipoTransacao),
   valor: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Valor deve ser maior que 0'),
 });
 
-type TransactionFormData = z.infer<typeof transactionSchema>;
+type TransacaoFormData = z.infer<typeof transacaoSchema>;
 
-interface TransactionFormProps {
-  transaction?: Transacao;
+interface TransacaoFormProps {
+  transacao?: Transacao;
   onSuccess?: () => void;
 }
 
-export function TransactionForm({ transaction, onSuccess }: TransactionFormProps) {
-  const { createTransaction, updateTransaction } = useTransactions();
-  const { categories, fetchCategories } = useCategories();
-  const { people, fetchPeople } = usePeople();
+export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
+  const { createTransacao, updateTransacao } = useTransacao();
+  const { listCategorias, getCategorias } = useCategorias();
+  const { listPessoa, getPessoa } = usePessoa();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPersonIsMenor, setSelectedPersonIsMenor] = useState(false);
 
-  const form = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
+  const form = useForm<TransacaoFormData>({
+    resolver: zodResolver(transacaoSchema),
     defaultValues: {
-      categoriaId: transaction?.categoriaId?.toString() || '',
-      pessoaId: transaction?.pessoaId?.toString() || '',
-      dataTransacao: transaction?.dataTransacao?.split('T')[0] || new Date().toISOString().split('T')[0],
-      descricao: transaction?.descricao || '',
-      tipo: transaction?.tipo || 'Despesa',
-      valor: transaction?.valor?.toString() || '',
+      id: transacao?.id || 0,
+      categoriaId: transacao?.categoriaId?.toString() || '',
+      pessoaId: transacao?.pessoaId?.toString() || '',
+      dataTransacao: transacao?.dataTransacao?.split('T')[0] || new Date().toISOString().split('T')[0],
+      descricao: transacao?.descricao || '',
+      tipo: transacao?.tipo || TipoTransacao.Despesa,
+      valor: transacao?.valor?.toString() || '',
     },
   });
 
   // Carregar categorias e pessoas
   useEffect(() => {
-    fetchCategories();
-    fetchPeople();
-  }, [fetchCategories, fetchPeople]);
+    getCategorias();
+    getPessoa();
+  }, [getCategorias, getPessoa]);
 
   // Verificar se pessoa selecionada é menor de idade
   const pessoaId = form.watch('pessoaId');
   useEffect(() => {
     if (pessoaId) {
-      const selectedPerson = people.find((p) => p.id === Number(pessoaId));
+      const selectedPerson = listPessoa.find((f) => f.id === Number(pessoaId));
       if (selectedPerson) {
         const isMenor = ehMenorDeIdade(selectedPerson.dataNascimento);
         setSelectedPersonIsMenor(isMenor);
 
         // Se é menor, força o tipo para Despesa
-        if (isMenor && form.getValues('tipo') === 'Receita') {
-          form.setValue('tipo', 'Despesa');
+        if (isMenor && form.getValues('tipo') === TipoTransacao.Receita) {
+          form.setValue('tipo', TipoTransacao.Despesa);
         }
       }
     }
-  }, [pessoaId, people, form]);
+  }, [pessoaId, listPessoa, form]);
 
-  async function onSubmit(values: TransactionFormData) {
+  const tipo = form.watch("tipo");
+
+  const categoriasFiltradas = listCategorias.filter(c => {
+    if (tipo === TipoTransacao.Despesa) {
+      return c.finalidade === 1 || c.finalidade === 3;
+    }
+
+    if (tipo === TipoTransacao.Receita) {
+      return c.finalidade === 2 || c.finalidade === 3;
+    }
+
+    return true;
+  });
+
+  async function onSubmit(values: TransacaoFormData) {
     // Validação final: menor não pode ter Receita
-    if (selectedPersonIsMenor && values.tipo === 'Receita') {
+    if (selectedPersonIsMenor && values.tipo === TipoTransacao.Receita) {
       toast.error('Pessoas menores de idade não podem registrar receitas');
       return;
     }
@@ -99,19 +115,20 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
     setIsSubmitting(true);
     try {
       const payload = {
+        id: values.id,
         categoriaId: Number(values.categoriaId),
         pessoaId: Number(values.pessoaId),
         dataTransacao: values.dataTransacao,
         descricao: values.descricao,
-        tipo: values.tipo,
+        tipo: values.tipo === TipoTransacao.Despesa ? 1 : 2,
         valor: Number(values.valor),
       };
 
-      if (transaction) {
-        await updateTransaction(transaction.id, payload);
+      if (transacao) {
+        await updateTransacao(transacao.id, payload);
         toast.success('Transação atualizada com sucesso!');
       } else {
-        await createTransaction(payload);
+        await createTransacao(payload);
         toast.success('Transação criada com sucesso!');
         form.reset();
       }
@@ -145,14 +162,14 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
               <FormLabel>Pessoa</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="border-slate-300 focus:border-emerald-500">
+                  <SelectTrigger className="w-full border-slate-300 focus:border-emerald-500">
                     <SelectValue placeholder="Selecione uma pessoa" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {people.map((person) => (
-                    <SelectItem key={person.id} value={person.id.toString()}>
-                      {person.nome}
+                  {listPessoa.map((pessoa) => (
+                    <SelectItem key={pessoa.id} value={pessoa.id.toString()}>
+                      {pessoa.nome}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -168,20 +185,21 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tipo</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={(value) => field.onChange(Number(value))}
+                defaultValue={field.value?.toString()}>
                 <FormControl>
                   <SelectTrigger
-                    className="border-slate-300 focus:border-emerald-500"
+                    className="w-full border-slate-300 focus:border-emerald-500"
                     disabled={selectedPersonIsMenor}
                   >
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Receita" disabled={selectedPersonIsMenor}>
+                  <SelectItem value="2" disabled={selectedPersonIsMenor}>
                     Receita {selectedPersonIsMenor && '(Desabilitado)'}
                   </SelectItem>
-                  <SelectItem value="Despesa">Despesa</SelectItem>
+                  <SelectItem value="1">Despesa</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -197,14 +215,14 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
               <FormLabel>Categoria</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="border-slate-300 focus:border-emerald-500">
+                  <SelectTrigger className="w-full border-slate-300 focus:border-emerald-500">
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {categories.map((category) => (
+                  {categoriasFiltradas.map((category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.nome}
+                      {category.descricao}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -284,7 +302,7 @@ export function TransactionForm({ transaction, onSuccess }: TransactionFormProps
               <Spinner className="mr-2 h-4 w-4" />
               Salvando...
             </>
-          ) : transaction ? (
+          ) : transacao ? (
             'Atualizar'
           ) : (
             'Criar'
