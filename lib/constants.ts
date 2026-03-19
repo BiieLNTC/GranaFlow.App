@@ -10,6 +10,9 @@ export const API_ENDPOINTS = {
   TRANSACTIONS: '/api/transacao',
   ObterTotaisTransacoes: '/api/transacao/ObterTotaisTransacoes',
   ObterTotaisPessoas: '/api/transacao/ObterTotaisPessoas',
+  ObterTotaisCategorias: '/api/transacao/ObterTotaisCategorias',
+  ObterTopDespesas: '/api/transacao/ObterTopDespesas',
+  ObterTopReceitas: '/api/transacao/ObterTopReceitas',
   TRANSACTION: (id: number) => `/api/transacao/${id}`,
   
   // Categories

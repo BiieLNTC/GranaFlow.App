@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePessoa } from '@/hooks/use-pessoa';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { ConfirmDialog } from '../ui/confirm-dialog';
+import PaginationBox from '../pagination-box/pagination-box';
 
 export function ListPessoa() {
   const { listPessoa, isLoading, getPessoa, deletePessoa } = usePessoa();
@@ -55,6 +56,20 @@ export function ListPessoa() {
     setPessoaSelectd(undefined);
     getPessoa();
   };
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize] = useState(5)
+  const totalPages = Math.ceil(listPessoa.length / pageSize) || 1
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return listPessoa.slice(start, end);
+  }, [listPessoa, currentPage]);
+
 
   return (
     <div className="space-y-4">
@@ -123,7 +138,7 @@ export function ListPessoa() {
               </TableHeader>
 
               <TableBody>
-                {listPessoa.slice(0, 10).map((pessoa) => (
+                {paginatedData.map((pessoa) => (
                   <TableRow key={pessoa.id} className="border-border hover:bg-secondary/50">
                     {/* Opções */}
                     <TableCell className="text-center">
@@ -168,6 +183,10 @@ export function ListPessoa() {
                 ))}
               </TableBody>
             </Table>
+
+            {listPessoa.length > 0 && (
+              <PaginationBox totalPages={totalPages || 1} currentPage={currentPage} onPagechange={handlePageChange} />
+            )}
           </CardContent>
         </Card>
       )}

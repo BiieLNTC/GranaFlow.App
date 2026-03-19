@@ -31,7 +31,6 @@ const menuItems = [
   },
 ];
 
-
 export function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();

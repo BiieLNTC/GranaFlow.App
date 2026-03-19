@@ -76,6 +76,9 @@ export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
 
   // Verificar se pessoa selecionada é menor de idade
   const pessoaId = form.watch('pessoaId');
+  const tipo = form.watch("tipo");
+  const categoriaId = form.watch("categoriaId");
+
   useEffect(() => {
     if (pessoaId) {
       const selectedPerson = listPessoa.find((f) => f.id === Number(pessoaId));
@@ -91,7 +94,27 @@ export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
     }
   }, [pessoaId, listPessoa, form]);
 
-  const tipo = form.watch("tipo");
+  useEffect(() => {
+    if (!categoriaId) return;
+
+    const categoriaSelecionada = listCategorias.find(
+      (c) => c.id === Number(categoriaId)
+    );
+
+    if (!categoriaSelecionada) return;
+
+    const finalidade = categoriaSelecionada.finalidade;
+
+    const tipoAtual = form.getValues("tipo");
+
+    const categoriaInvalida =
+      (tipoAtual === TipoTransacao.Receita && finalidade === 1) ||
+      (tipoAtual === TipoTransacao.Despesa && finalidade === 2);
+
+    if (categoriaInvalida) {
+      form.setValue("categoriaId", "")
+    }
+  }, [tipo, categoriaId, listCategorias]);
 
   const categoriasFiltradas = listCategorias.filter(c => {
     if (tipo === TipoTransacao.Despesa) {
@@ -160,7 +183,7 @@ export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Pessoa</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full border-slate-300 focus:border-emerald-500">
                     <SelectValue placeholder="Selecione uma pessoa" />
@@ -186,7 +209,7 @@ export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
             <FormItem>
               <FormLabel>Tipo</FormLabel>
               <Select onValueChange={(value) => field.onChange(Number(value))}
-                defaultValue={field.value?.toString()}>
+                value={field.value?.toString()}>
                 <FormControl>
                   <SelectTrigger
                     className="w-full border-slate-300 focus:border-emerald-500"
@@ -213,7 +236,7 @@ export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Categoria</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full border-slate-300 focus:border-emerald-500">
                     <SelectValue placeholder="Selecione uma categoria" />

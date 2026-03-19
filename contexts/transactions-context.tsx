@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useCallback, ReactNode } from 'react';
-import { Transacao, CreateTransacaoRequest, TotaisTransacoes, DEFAULT_TOTAIS_TRANSACOES, TotaisPessoa } from '@/lib/types';
+import { Transacao, CreateTransacaoRequest, TotaisTransacoes, DEFAULT_TOTAIS_TRANSACOES, TotaisPessoa, TotaisCategoria, TopDespesas, TopReceitas } from '@/lib/types';
 import { apiClient } from '@/lib/api-client';
 import { API_ENDPOINTS } from '@/lib/constants';
 
@@ -9,11 +9,17 @@ interface TransacaoContextType {
   totaisTransacoes: TotaisTransacoes;
   listTransacoes: Transacao[];
   listTotaisPessoa: TotaisPessoa[];
+  listTotaisCategoria: TotaisCategoria[];
+  listTopDespesas: TopDespesas[];
+  listTopReceitas: TopReceitas[];
   isLoading: boolean;
   error: string | null;
-  getListTransacao: () => Promise<void>;
+  getListTransacao: (dataInicial: Date, dataFinal: Date) => Promise<void>;
   getTotaisTransacao: () => Promise<void>;
   getTotaisPessoa: () => Promise<void>;
+  getTotaisCategoria: () => Promise<void>;
+  getTopDespesas: () => Promise<void>;
+  getTopReceitas: () => Promise<void>;
   createTransacao: (data: CreateTransacaoRequest) => Promise<Transacao>;
   updateTransacao: (id: number, data: CreateTransacaoRequest) => Promise<Transacao>;
   deleteTransacao: (id: number) => Promise<void>;
@@ -25,15 +31,26 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
   const [listTransacoes, setListTransacoes] = useState<Transacao[]>([]);
   const [totaisTransacoes, setTotaisTransacoes] = useState<TotaisTransacoes>(DEFAULT_TOTAIS_TRANSACOES)
   const [listTotaisPessoa, setListTotaisPessoa] = useState<TotaisPessoa[]>([])
+  const [listTotaisCategoria, setlistTotaisCategoria] = useState<TotaisCategoria[]>([])
+  const [listTopDespesas, setListTopDespesas] = useState<TopDespesas[]>([])
+  const [listTopReceitas, setListTopReceitas] = useState<TopReceitas[]>([])
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getListTransacao = useCallback(async () => {
+  const getListTransacao = useCallback(async (dataInicial: Date, dataFinal: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get<Transacao[]>(API_ENDPOINTS.TRANSACTIONS);
+      const data = await apiClient.get<Transacao[]>(API_ENDPOINTS.TRANSACTIONS,
+        {
+          params: {
+            dataInicial: dataInicial.toISOString(),
+            dataFinal: dataFinal.toISOString(),
+          }
+        }
+      );
+
       setListTransacoes(Array.isArray(data) ? data : []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
@@ -103,12 +120,60 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-    const getTotaisPessoa = useCallback(async () => {
+  const getTotaisPessoa = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await apiClient.get<TotaisPessoa[]>(API_ENDPOINTS.ObterTotaisPessoas);
       setListTotaisPessoa(data);
+    }
+    catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
+      setError(errorMessage);
+      console.error('Erro ao buscar transações:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [])
+
+  const getTotaisCategoria = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiClient.get<TotaisCategoria[]>(API_ENDPOINTS.ObterTotaisCategorias);
+      setlistTotaisCategoria(data);
+    }
+    catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
+      setError(errorMessage);
+      console.error('Erro ao buscar transações:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [])
+
+  const getTopDespesas = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiClient.get<TopDespesas[]>(API_ENDPOINTS.ObterTopDespesas);
+      setListTopDespesas(data);
+    }
+    catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
+      setError(errorMessage);
+      console.error('Erro ao buscar transações:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [])
+
+  const getTopReceitas = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiClient.get<TopReceitas[]>(API_ENDPOINTS.ObterTopReceitas);
+      setListTopReceitas(data);
     }
     catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar transações';
@@ -125,11 +190,17 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
         totaisTransacoes,
         listTransacoes,
         listTotaisPessoa,
+        listTotaisCategoria,
+        listTopDespesas,
+        listTopReceitas,
         isLoading,
         error,
         getListTransacao,
         getTotaisTransacao,
         getTotaisPessoa,
+        getTotaisCategoria,
+        getTopDespesas,
+        getTopReceitas,
         createTransacao,
         updateTransacao,
         deleteTransacao,

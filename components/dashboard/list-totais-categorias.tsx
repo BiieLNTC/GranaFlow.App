@@ -6,12 +6,12 @@ import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, Tabl
 import { useEffect, useMemo, useState } from "react";
 import PaginationBox from "../pagination-box/pagination-box";
 
-export function ListTotaisPorPessoa() {
-    const { listTotaisPessoa, getTotaisPessoa, isLoading } = useTransacao();
+export function ListTotaisPorCategoria() {
+    const { listTotaisCategoria, getTotaisCategoria, isLoading } = useTransacao();
 
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize] = useState(5)
-    const totalPages = Math.ceil(listTotaisPessoa.length / pageSize) || 1
+    const totalPages = Math.ceil(listTotaisCategoria.length / pageSize) || 1
     const handlePageChange = (page: number) => {
         setCurrentPage(page)
     }
@@ -19,13 +19,13 @@ export function ListTotaisPorPessoa() {
     const paginatedData = useMemo(() => {
         const start = (currentPage - 1) * pageSize;
         const end = start + pageSize;
-        return listTotaisPessoa.slice(start, end);
-    }, [listTotaisPessoa, currentPage]);
+        return listTotaisCategoria.slice(start, end);
+    }, [listTotaisCategoria, currentPage]);
 
 
     useEffect(() => {
-        getTotaisPessoa();
-    }, [getTotaisPessoa]);
+        getTotaisCategoria();
+    }, [getTotaisCategoria]);
 
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('pt-BR', {
@@ -36,7 +36,7 @@ export function ListTotaisPorPessoa() {
     };
 
     const totais = useMemo(() => {
-        return listTotaisPessoa.reduce(
+        return listTotaisCategoria.reduce(
             (acc, curr) => {
                 acc.receitas += curr.receitas;
                 acc.despesas += curr.despesas;
@@ -45,7 +45,7 @@ export function ListTotaisPorPessoa() {
             },
             { receitas: 0, despesas: 0, saldo: 0 }
         );
-    }, [listTotaisPessoa]);
+    }, [listTotaisCategoria]);
 
     return (
         isLoading ?
@@ -55,11 +55,11 @@ export function ListTotaisPorPessoa() {
                         Carregando totais por pessoa...
                     </CardContent>
                 </Card>
-            ) : listTotaisPessoa.length === 0 ? (
+            ) : listTotaisCategoria.length === 0 ? (
 
                 <Card className="border-slate-200">
                     <CardHeader>
-                        <CardTitle>Totais por Pessoa</CardTitle>
+                        <CardTitle>Totais por Categoria</CardTitle>
                         <CardDescription>Nenhuma despesa registrada</CardDescription>
                     </CardHeader>
                     <CardContent className="h-64 flex items-center justify-center text-slate-400">
@@ -69,26 +69,33 @@ export function ListTotaisPorPessoa() {
             ) : (
                 <Card className="border-slate-200">
                     <CardHeader>
-                        <CardTitle>Totais por Pessoa</CardTitle>
-                        <CardDescription>Totais detalhados por pessoa</CardDescription>
+                        <CardTitle>Totais por Categoria</CardTitle>
+                        <CardDescription>Totais detalhados por categoria</CardDescription>
                     </CardHeader>
                     <CardContent className="h-64 flex items-center justify-center text-slate-400">
                         <Table className="border-border">
                             <TableHeader>
                                 <TableRow className="border-border hover:bg-secondary/50">
-                                    <TableHead className="text-center text-muted-foreground">Nome</TableHead>
+                                    <TableHead className="text-center text-muted-foreground">Descrição</TableHead>
                                     <TableHead className="text-center text-muted-foreground">Despesa</TableHead>
                                     <TableHead className="text-center text-muted-foreground">Receita</TableHead>
                                     <TableHead className="text-center text-right text-muted-foreground">Total</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {paginatedData.map((invoice) => (
-                                    <TableRow key={invoice.nome}>
-                                        <TableCell className="text-center font-medium text-foreground">{invoice.nome}</TableCell>
-                                        <TableCell className="text-center font-medium text-foreground">{formatCurrency(invoice.despesas)}</TableCell>
-                                        <TableCell className="text-center font-medium text-foreground">{formatCurrency(invoice.receitas)}</TableCell>
-                                        <TableCell className="text-right font-medium text-foreground">{formatCurrency(invoice.saldo)}</TableCell>
+                                {paginatedData.map((categoria) => (
+                                    <TableRow key={categoria.descricao}>
+                                        <TableCell className="text-center font-medium text-foreground">
+                                            <span
+                                                className="px-3 py-1 rounded-full text-white text-sm font-medium"
+                                                style={{ backgroundColor: categoria.cor }}
+                                            >
+                                                {categoria.descricao}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="text-center font-medium text-foreground">{formatCurrency(categoria.despesas)}</TableCell>
+                                        <TableCell className="text-center font-medium text-foreground">{formatCurrency(categoria.receitas)}</TableCell>
+                                        <TableCell className="text-right font-medium text-foreground">{formatCurrency(categoria.saldo)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -106,7 +113,7 @@ export function ListTotaisPorPessoa() {
                     </CardContent>
 
 
-                    {listTotaisPessoa.length > 0 && (
+                    {listTotaisCategoria.length > 0 && (
                         <PaginationBox totalPages={totalPages || 1} currentPage={currentPage} onPagechange={handlePageChange} />
                     )}
                 </Card>

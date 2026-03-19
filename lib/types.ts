@@ -107,6 +107,26 @@ export interface TotaisPessoa {
   saldo: number
 }
 
+export interface TotaisCategoria {
+  descricao: string
+  cor: string
+  receitas: number
+  despesas: number
+  saldo: number
+}
+
+export interface TopDespesas{
+  cor: string
+  nomeCategoria: string
+  valor: number
+}
+
+export interface TopReceitas{
+  cor: string
+  nomeCategoria: string
+  valor: number
+}
+
 // Helper para calcular idade
 export function calcularIdade(dataNascimento: string): number {
   const today = new Date();

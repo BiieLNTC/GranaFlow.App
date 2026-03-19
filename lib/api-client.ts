@@ -3,6 +3,7 @@ import { API_BASE_URL, STORAGE_KEYS } from './constants';
 // Tipos para requisições e respostas
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;
+  params?: Record<string, any>
 }
 
 interface ApiResponse<T = any> {
@@ -69,8 +70,20 @@ class ApiClient {
     body?: any,
     options?: RequestOptions
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    let url = `${this.baseUrl}${endpoint}`;
     const headers = this.getHeaders(options?.headers);
+
+    if (options?.params) {
+      const query = new URLSearchParams();
+
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          query.append(key, String(value));
+        }
+      });
+
+      url += `?${query.toString()}`;
+    }
 
     const config: RequestInit = {
       ...options,
@@ -98,8 +111,8 @@ class ApiClient {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.message || 
-          errorData.error || 
+          errorData.message ||
+          errorData.error ||
           `Erro ${response.status}: ${response.statusText}`
         );
       }

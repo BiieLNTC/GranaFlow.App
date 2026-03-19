@@ -2,8 +2,10 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { DashboardSummary } from '@/components/dashboard/dashboard-summary';
-import { ExpensesChart } from '@/components/dashboard/expenses-chart';
+import { TopDespesasChart } from '@/components/dashboard/top-despesas-chart';
 import { ListTotaisPorPessoa } from '@/components/dashboard/list-totais-pessoa';
+import { ListTotaisPorCategoria } from '@/components/dashboard/list-totais-categorias';
+import { TopReceitasChart } from '@/components/dashboard/top-receitas-chart';
 
 export default function DashboardPage() {
   const { nameUser } = useAuth();
@@ -25,9 +27,12 @@ export default function DashboardPage() {
       {/*Totais por Pessoa*/}
       <ListTotaisPorPessoa />
 
+      <ListTotaisPorCategoria />
+
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ExpensesChart />
+        <TopDespesasChart />
+        <TopReceitasChart />
       </div>
     </div>
   );
