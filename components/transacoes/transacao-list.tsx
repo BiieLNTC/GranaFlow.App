@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { TransacaoForm } from './transaction-form';
+import { TransacaoForm } from './transacao-form';
 import { Trash2, Edit2, Plus, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { TipoTransacao, Transacao } from '@/lib/types';
@@ -31,7 +31,7 @@ import PaginationBox from '../pagination-box/pagination-box';
 import { ConfirmDialog } from '../ui/confirm-dialog';
 import DateFilter from "../date-filter/date-filter";
 
-export function TransactionList() {
+export function ListTransacao() {
   const { listTransacoes, isLoading, getListTransacao, deleteTransacao } = useTransacao();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transacao | undefined>();

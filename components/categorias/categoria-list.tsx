@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { CategoryForm } from './categoria-form';
+import { CategoriaForm } from './categoria-form';
 import { Trash2, Edit2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Categoria } from '@/lib/types';
@@ -100,7 +100,7 @@ export function ListCategoria() {
                   : 'Crie uma nova categoria para suas transações'}
               </DialogDescription>
             </DialogHeader>
-            <CategoryForm categoria={selectedCategory} onSuccess={handleFormSuccess} />
+            <CategoriaForm categoria={selectedCategory} onSuccess={handleFormSuccess} />
           </DialogContent>
         </Dialog>
       </div>

@@ -40,7 +40,7 @@ interface CategoriaFormProps {
   onSuccess?: () => void;
 }
 
-export function CategoryForm({ categoria, onSuccess }: CategoriaFormProps) {
+export function CategoriaForm({ categoria, onSuccess }: CategoriaFormProps) {
   
   const { createCategoria, updateCategoria } = useCategorias();
   const [isSubmitting, setIsSubmitting] = useState(false);

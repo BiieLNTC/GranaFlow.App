@@ -2,9 +2,9 @@
 
 import { Sidebar } from '@/components/layout/sidebar';
 import { useAuth } from '@/hooks/use-auth';
-import { CategoriaProvider } from '@/contexts/categories-context';
-import { PeopleProvider } from '@/contexts/people-context';
-import { TransacaoProvider } from '@/contexts/transactions-context';
+import { CategoriaProvider } from '@/contexts/categoria-context';
+import { PeopleProvider } from '@/contexts/pessoa-context';
+import { TransacaoProvider } from '@/contexts/transacao-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

@@ -1,4 +1,4 @@
-import { TransactionList } from '@/components/transacoes/transaction-list';
+import { ListTransacao } from '@/components/transacoes/transacao-list';
 
 export const metadata = {
   title: 'Transações - GranaFlow',
@@ -8,7 +8,7 @@ export const metadata = {
 export default function TransactionsPage() {
   return (
     <div>
-      <TransactionList />
+      <ListTransacao />
     </div>
   );
 }

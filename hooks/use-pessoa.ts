@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { PessoaContext } from '@/contexts/people-context';
+import { PessoaContext } from '@/contexts/pessoa-context';
 
 export function usePessoa() {
   const context = useContext(PessoaContext);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { CategoriaContext } from '@/contexts/categories-context';
+import { CategoriaContext } from '@/contexts/categoria-context';
 
 export function useCategorias() {
   const context = useContext(CategoriaContext);

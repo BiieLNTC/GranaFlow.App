@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { TransacaoContext } from '@/contexts/transactions-context';
+import { TransacaoContext } from '@/contexts/transacao-context';
 
 export function useTransacao() {
   const context = useContext(TransacaoContext);
