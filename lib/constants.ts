@@ -1,11 +1,11 @@
 // API Configuration
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:44330';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const API_ENDPOINTS = {
   // Auth
   LOGIN: '/api/usuario/Login',
   REGISTER: '/api/usuario/CreateAccount',
-  
+
   // Transactions
   TRANSACTIONS: '/api/transacao',
   ObterTotaisTransacoes: '/api/transacao/ObterTotaisTransacoes',
@@ -14,11 +14,11 @@ export const API_ENDPOINTS = {
   ObterTopDespesas: '/api/transacao/ObterTopDespesas',
   ObterTopReceitas: '/api/transacao/ObterTopReceitas',
   TRANSACTION: (id: number) => `/api/transacao/${id}`,
-  
+
   // Categories
   CATEGORIES: '/api/categoria',
   CATEGORY: (id: number) => `/api/categoria/${id}`,
-  
+
   // People
   PEOPLE: '/api/pessoa',
   PERSON: (id: number) => `/api/pessoa/${id}`,
