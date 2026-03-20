@@ -5,22 +5,29 @@ import { useTransacao } from '@/hooks/use-transacao';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
-export function TopReceitasChart() {
+type Props = {
+    filtro: {
+        dataInicial: Date
+        dataFinal: Date
+    }
+}
+
+export function TopReceitasChart({ filtro }: Props) {
   const { listTopReceitas, getTopReceitas } = useTransacao();
 
-  useEffect(() => {
-    getTopReceitas();
-  }, [getTopReceitas]);
+    useEffect(() => {
+        getTopReceitas(filtro.dataInicial, filtro.dataFinal)
+    }, [filtro])
 
   if (listTopReceitas.length === 0) {
     return (
       <Card className="border-slate-200">
         <CardHeader>
           <CardTitle>Receitas por Categoria</CardTitle>
-          <CardDescription>Nenhuma despesa registrada</CardDescription>
+          <CardDescription>Nenhuma receita registrada</CardDescription>
         </CardHeader>
         <CardContent className="h-64 flex items-center justify-center text-slate-400">
-          <p>Adicione despesas para visualizar o gráfico</p>
+          <p>Adicione receitas para visualizar o gráfico</p>
         </CardContent>
       </Card>
     );

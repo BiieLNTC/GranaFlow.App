@@ -61,7 +61,7 @@ export function TransacaoForm({ transacao, onSuccess }: TransacaoFormProps) {
       id: transacao?.id || 0,
       categoriaId: transacao?.categoriaId?.toString() || '',
       pessoaId: transacao?.pessoaId?.toString() || '',
-      dataTransacao: transacao?.dataTransacao?.split('T')[0] || new Date().toISOString().split('T')[0],
+      dataTransacao: transacao?.dataTransacao?.split('T')[0] || new Date().toLocaleDateString('sv-SE'),
       descricao: transacao?.descricao || '',
       tipo: transacao?.tipo || TipoTransacao.Despesa,
       valor: transacao?.valor?.toString() || '',

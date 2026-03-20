@@ -1,4 +1,4 @@
-import { TransactionList } from '@/components/transactions/transaction-list';
+import { TransactionList } from '@/components/transacoes/transaction-list';
 
 export const metadata = {
   title: 'Transações - GranaFlow',

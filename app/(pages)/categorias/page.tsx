@@ -1,4 +1,4 @@
-import { ListCategoria } from '@/components/categories/categoria-list';
+import { ListCategoria } from '@/components/categorias/categoria-list';
 
 export const metadata = {
   title: 'Categorias - GranaFlow',

@@ -53,15 +53,21 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterFormData) {
     setIsSubmitting(true);
     try {
-      await register({
+      var result = await register({
         nome: values.nome,
         email: values.email,
         senha: values.senha,
         confirmarSenha: values.confirmarSenha,
       });
-      
-      toast.success('Cadastro realizado com sucesso!');
-      router.push('/');
+
+      if (result) {
+        toast.success('Cadastro realizado com sucesso!');
+
+        router.replace('/login');
+      }
+      else {
+        toast.error('Algo deu errado!');
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao cadastrar';
       toast.error(errorMessage);

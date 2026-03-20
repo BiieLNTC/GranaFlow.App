@@ -23,15 +23,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TransacaoForm } from './transaction-form';
-import { Trash2, Edit2, Plus, ArrowUpRight, ArrowDownLeft, CalendarIcon, Search } from 'lucide-react';
+import { Trash2, Edit2, Plus, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { TipoTransacao, Transacao } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import PaginationBox from '../pagination-box/pagination-box';
 import { ConfirmDialog } from '../ui/confirm-dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Calendar } from '../ui/calendar';
-import { Label } from "../ui/label";
+import DateFilter from "../date-filter/date-filter";
 
 export function TransactionList() {
   const { listTransacoes, isLoading, getListTransacao, deleteTransacao } = useTransacao();
@@ -39,8 +37,18 @@ export function TransactionList() {
   const [selectedTransaction, setSelectedTransaction] = useState<Transacao | undefined>();
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
 
-  const [dataInicialFiltro, setDataInicialFiltro] = useState(new Date())
-  const [dataFinalFiltro, setDataFinalFiltro] = useState(new Date())
+  const hoje = new Date()
+  const diaSemana = hoje.getDay()
+  const diffInicio = diaSemana === 0 ? -6 : 1 - diaSemana
+
+  const primeiroDiaSemana = new Date(hoje)
+  primeiroDiaSemana.setDate(hoje.getDate() + diffInicio)
+
+  const ultimoDiaSemana = new Date(primeiroDiaSemana)
+  ultimoDiaSemana.setDate(primeiroDiaSemana.getDate() + 6)
+
+  const [dataInicialFiltro, setDataInicialFiltro] = useState(primeiroDiaSemana)
+  const [dataFinalFiltro, setDataFinalFiltro] = useState(ultimoDiaSemana)
 
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(10)
@@ -51,15 +59,15 @@ export function TransactionList() {
 
   useEffect(() => {
     getListTransacao(dataInicialFiltro, dataFinalFiltro);
-  }, [getListTransacao]);
+  }, []);
 
-  async function filtrarList() {
-    if (dataInicialFiltro > dataFinalFiltro) {
+  async function filtrarList(dataInicial: Date, dataFinal: Date) {
+    if (dataInicial > dataFinal) {
       toast.error("A Data Inicial não pode ser maior que a Data Final")
       return;
     }
 
-    getListTransacao(dataInicialFiltro, dataFinalFiltro)
+    getListTransacao(dataInicial, dataFinal)
   }
 
   const paginatedData = useMemo(() => {
@@ -84,6 +92,7 @@ export function TransactionList() {
   const handleFormSuccess = () => {
     setIsOpen(false);
     setSelectedTransaction(undefined);
+
     getListTransacao(dataInicialFiltro, dataFinalFiltro);
   };
 
@@ -151,59 +160,12 @@ export function TransactionList() {
           <CardContent>
             <div className="overflow-x-auto">
 
-              <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-muted-foreground">Data Inicial</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full sm:w-auto justify-start text-left font-normal text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        <span className="truncate">{format(dataInicialFiltro, "dd/MM/yyyy", { locale: ptBR })}</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={dataInicialFiltro}
-                        onSelect={(date) => date && setDataInicialFiltro(date)}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-muted-foreground">Data Final</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full sm:w-auto justify-start text-left font-normal text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        <span className="truncate">{format(dataFinalFiltro, "dd/MM/yyyy", { locale: ptBR })}</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={dataFinalFiltro}
-                        onSelect={(date) => date && setDataFinalFiltro(date)}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div style={{ marginTop: '17px' }}>
-                  <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                    onClick={() => filtrarList()}
-                  >
-                    <Search className="mr-2 h-4 w-4" />
-                    Filtrar
-                  </Button>
-                </div>
-              </div>
+              <DateFilter onFilter={filtrarList}
+                dataInicial={dataInicialFiltro}
+                setDataInicial={setDataInicialFiltro}
+                dataFinal={dataFinalFiltro}
+                setDataFinal={setDataFinalFiltro}>
+              </DateFilter>
 
               {listTransacoes.length === 0 ? (
                 <CardContent className="py-8 text-center text-slate-400">

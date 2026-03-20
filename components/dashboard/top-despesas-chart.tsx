@@ -5,12 +5,19 @@ import { useTransacao } from '@/hooks/use-transacao';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
-export function TopDespesasChart() {
+type Props = {
+  filtro: {
+    dataInicial: Date
+    dataFinal: Date
+  }
+}
+
+export function TopDespesasChart({ filtro }: Props) {
   const { listTopDespesas, getTopDespesas } = useTransacao();
 
   useEffect(() => {
-    getTopDespesas();
-  }, [getTopDespesas]);
+    getTopDespesas(filtro.dataInicial, filtro.dataFinal)
+  }, [filtro])
 
   if (listTopDespesas.length === 0) {
     return (
@@ -57,7 +64,7 @@ export function TopDespesasChart() {
                   maximumFractionDigits: 2,
                 })}`
               }
-            /> 
+            />
             <Legend />
           </PieChart>
         </ResponsiveContainer>

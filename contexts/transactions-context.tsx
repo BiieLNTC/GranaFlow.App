@@ -16,10 +16,10 @@ interface TransacaoContextType {
   error: string | null;
   getListTransacao: (dataInicial: Date, dataFinal: Date) => Promise<void>;
   getTotaisTransacao: () => Promise<void>;
-  getTotaisPessoa: () => Promise<void>;
-  getTotaisCategoria: () => Promise<void>;
-  getTopDespesas: () => Promise<void>;
-  getTopReceitas: () => Promise<void>;
+  getTotaisPessoa: (dataInicial: Date, dataFinal: Date) => Promise<void>;
+  getTotaisCategoria: (dataInicial: Date, dataFinal: Date) => Promise<void>;
+  getTopDespesas: (dataInicial: Date, dataFinal: Date) => Promise<void>;
+  getTopReceitas: (dataInicial: Date, dataFinal: Date) => Promise<void>;
   createTransacao: (data: CreateTransacaoRequest) => Promise<Transacao>;
   updateTransacao: (id: number, data: CreateTransacaoRequest) => Promise<Transacao>;
   deleteTransacao: (id: number) => Promise<void>;
@@ -45,8 +45,8 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
       const data = await apiClient.get<Transacao[]>(API_ENDPOINTS.TRANSACTIONS,
         {
           params: {
-            dataInicial: dataInicial.toISOString(),
-            dataFinal: dataFinal.toISOString(),
+            dataInicial: dataInicial.toLocaleDateString('sv-SE'),
+            dataFinal: dataFinal.toLocaleDateString('sv-SE'),
           }
         }
       );
@@ -120,11 +120,18 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const getTotaisPessoa = useCallback(async () => {
+  const getTotaisPessoa = useCallback(async (dataInicial: Date, dataFinal: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get<TotaisPessoa[]>(API_ENDPOINTS.ObterTotaisPessoas);
+      const data = await apiClient.get<TotaisPessoa[]>(API_ENDPOINTS.ObterTotaisPessoas,
+        {
+          params: {
+            dataInicial: dataInicial.toLocaleDateString('sv-SE'),
+            dataFinal: dataFinal.toLocaleDateString('sv-SE'),
+          }
+        }
+      );
       setListTotaisPessoa(data);
     }
     catch (err) {
@@ -136,11 +143,16 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const getTotaisCategoria = useCallback(async () => {
+  const getTotaisCategoria = useCallback(async (dataInicial: Date, dataFinal: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get<TotaisCategoria[]>(API_ENDPOINTS.ObterTotaisCategorias);
+      const data = await apiClient.get<TotaisCategoria[]>(API_ENDPOINTS.ObterTotaisCategorias, {
+        params: {
+          dataInicial: dataInicial.toLocaleDateString('sv-SE'),
+          dataFinal: dataFinal.toLocaleDateString('sv-SE'),
+        }
+      });
       setlistTotaisCategoria(data);
     }
     catch (err) {
@@ -152,11 +164,18 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const getTopDespesas = useCallback(async () => {
+  const getTopDespesas = useCallback(async (dataInicial: Date, dataFinal: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get<TopDespesas[]>(API_ENDPOINTS.ObterTopDespesas);
+      const data = await apiClient.get<TopDespesas[]>(API_ENDPOINTS.ObterTopDespesas,
+        {
+          params: {
+            dataInicial: dataInicial.toLocaleDateString('sv-SE'),
+            dataFinal: dataFinal.toLocaleDateString('sv-SE'),
+          }
+        }
+      );
       setListTopDespesas(data);
     }
     catch (err) {
@@ -168,11 +187,16 @@ export function TransacaoProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const getTopReceitas = useCallback(async () => {
+  const getTopReceitas = useCallback(async (dataInicial: Date, dataFinal: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get<TopReceitas[]>(API_ENDPOINTS.ObterTopReceitas);
+      const data = await apiClient.get<TopReceitas[]>(API_ENDPOINTS.ObterTopReceitas, {
+        params: {
+          dataInicial: dataInicial.toLocaleDateString('sv-SE'),
+          dataFinal: dataFinal.toLocaleDateString('sv-SE'),
+        }
+      });
       setListTopReceitas(data);
     }
     catch (err) {

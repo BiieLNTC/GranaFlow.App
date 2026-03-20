@@ -14,16 +14,16 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: '/granaflow-icon.png',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: '/granaflow-icon.png',
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/granaflow-icon.png',
+        type: 'image/png',
       },
     ],
     apple: '/apple-icon.png',
@@ -40,7 +40,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <AuthProvider>
           {children}
-          <Toaster />
+          <Toaster theme='light' richColors={true} />
         </AuthProvider>
         <Analytics />
       </body>

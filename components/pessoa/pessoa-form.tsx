@@ -18,14 +18,17 @@ import {
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { Pessoa } from '@/lib/types';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '../ui/calendar';
+import { ptBR } from 'date-fns/locale/pt-BR';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const pessoaSchema = z.object({
   id: z.number(),
-  nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres').max(200, 'Nome muito longo'),
-  dataNascimento: z.string().refine((date) => {
-    const d = new Date(date);
-    return d instanceof Date && !isNaN(d.getTime());
-  }, 'Data de nascimento inválida'),
+  nome: z.string().min(2, 'Nome deve ter no mínimo 3 caracteres').max(200, 'Nome muito longo'),
+  dataNascimento: z.date({ message: 'Campo Obrigatório!' })
 });
 
 type PersonFormData = z.infer<typeof pessoaSchema>;
@@ -44,7 +47,7 @@ export function PessoaForm({ pessoa, onSuccess }: PersonFormProps) {
     defaultValues: {
       id: pessoa?.id || 0,
       nome: pessoa?.nome || '',
-      dataNascimento: pessoa?.dataNascimento?.split('T')[0] || '',
+      dataNascimento: pessoa?.dataNascimento || new Date(),
     },
   });
 
@@ -97,12 +100,25 @@ export function PessoaForm({ pessoa, onSuccess }: PersonFormProps) {
             <FormItem>
               <FormLabel>Data de Nascimento</FormLabel>
               <FormControl>
-                <Input
-                  type="date"
-                  {...field}
-                  disabled={isSubmitting}
-                  className="border-slate-300 focus:border-emerald-500 focus:ring-emerald-500"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn("w-full sm:w-auto justify-start text-left font-normal text-muted-foreground")}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <span className="truncate">{format(field.value, "dd/MM/yyyy", { locale: ptBR })}</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      captionLayout='dropdown'
+                      selected={field.value}
+                      disabled={(date) => date > new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
               </FormControl>
               <FormMessage />
             </FormItem>

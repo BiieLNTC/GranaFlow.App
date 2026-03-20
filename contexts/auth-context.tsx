@@ -10,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -79,13 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (data: RegisterRequest) => {
     setIsLoading(true);
     try {
-      const response = await apiClient.post(API_ENDPOINTS.REGISTER, data);
+      const response = await apiClient.post<boolean>(API_ENDPOINTS.REGISTER, data);
 
-      if (response.token && response.usuario) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
-      } else {
-        throw new Error('Resposta inválida do servidor');
-      }
+      return response;
     } catch (error) {
       console.error('Erro ao registrar:', error);
       throw error;

@@ -69,13 +69,13 @@ export interface Pessoa {
   id: number;
   usuarioId: number;
   nome: string;
-  dataNascimento: string;
+  dataNascimento: Date;
   cadastradoEm: string;
 }
 
 export interface CreatePessoaRequest {
   nome: string;
-  dataNascimento: string;
+  dataNascimento: Date;
 }
 
 // Enum para tipos de transação
@@ -128,7 +128,7 @@ export interface TopReceitas{
 }
 
 // Helper para calcular idade
-export function calcularIdade(dataNascimento: string): number {
+export function calcularIdade(dataNascimento: Date): number {
   const today = new Date();
   const birthDate = new Date(dataNascimento);
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -140,6 +140,6 @@ export function calcularIdade(dataNascimento: string): number {
 }
 
 // Verificar se pessoa é menor de idade
-export function ehMenorDeIdade(dataNascimento: string): boolean {
+export function ehMenorDeIdade(dataNascimento: Date): boolean {
   return calcularIdade(dataNascimento) < 18;
 }

@@ -29,7 +29,7 @@ import {
 const categoriaSchema = z.object({
   id: z.number(),
   descricao: z.string({ message: "Campo Obrigatório!" }).min(2, 'Deve ter no mínimo 2 caracteres!').max(400, 'Nome muito longo'),
-  finalidade: z.number({ message: "Campo Obrigatório!" }),
+  finalidade: z.number({ message: "Campo Obrigatório!" }).min(1, "Campo Obrigatório!"),
   cor: z.string({ message: "Campo obrigatório!" }).regex(/^#([0-9A-Fa-f]{6})$/, "Cor inválida")
 });
 

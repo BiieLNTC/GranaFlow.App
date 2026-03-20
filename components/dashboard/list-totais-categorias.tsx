@@ -6,7 +6,14 @@ import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, Tabl
 import { useEffect, useMemo, useState } from "react";
 import PaginationBox from "../pagination-box/pagination-box";
 
-export function ListTotaisPorCategoria() {
+type Props = {
+    filtro: {
+        dataInicial: Date
+        dataFinal: Date
+    }
+}
+
+export function ListTotaisPorCategoria({ filtro }: Props) {
     const { listTotaisCategoria, getTotaisCategoria, isLoading } = useTransacao();
 
     const [currentPage, setCurrentPage] = useState(1)
@@ -22,10 +29,9 @@ export function ListTotaisPorCategoria() {
         return listTotaisCategoria.slice(start, end);
     }, [listTotaisCategoria, currentPage]);
 
-
     useEffect(() => {
-        getTotaisCategoria();
-    }, [getTotaisCategoria]);
+        getTotaisCategoria(filtro.dataInicial, filtro.dataFinal)
+    }, [filtro])
 
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('pt-BR', {
