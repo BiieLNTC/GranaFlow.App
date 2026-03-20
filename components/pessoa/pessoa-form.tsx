@@ -115,6 +115,7 @@ export function PessoaForm({ pessoa, onSuccess }: PersonFormProps) {
                       mode="single"
                       captionLayout='dropdown'
                       selected={field.value}
+                      onSelect={field.onChange}
                       disabled={(date) => date > new Date()}
                     />
                   </PopoverContent>
