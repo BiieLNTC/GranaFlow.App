@@ -67,7 +67,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto border-emerald-200 shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-emerald-700">GranaFlow</CardTitle>
+        <CardTitle className="text-center text-2xl font-bold text-emerald-700">GranaFlow</CardTitle>
         <CardDescription>Entre com suas credenciais para acessar sua conta</CardDescription>
       </CardHeader>
       <CardContent>
